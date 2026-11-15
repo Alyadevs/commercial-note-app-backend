@@ -17,7 +17,15 @@ export class ClientsController {
   findAll(@Req() req: any, @Query('commercialId') commercialId?: string) {
     return this.clientsService.findAll(req.user, commercialId);
   }
+ @Get('disponibles')
+findAvailable() {
+  return this.clientsService.findAvailable();
+}
 
+@Post(':id/rattacher')
+claim(@Param('id') id: string, @Req() req: any) {
+  return this.clientsService.claim(id, req.user);
+}
   @Get(':id')
   findOne(@Param('id') id: string, @Req() req: any) {
     return this.clientsService.findOne(id, req.user);
@@ -32,4 +40,5 @@ export class ClientsController {
   remove(@Param('id') id: string, @Req() req: any) {
     return this.clientsService.remove(id, req.user);
   }
+ 
 }

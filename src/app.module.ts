@@ -11,6 +11,8 @@ import { ActivityLogModule } from './activity-log/activity-log.module';
 import { UsersService } from './users/users.service';
 import { TransactionsModule } from './transaction/transaction.module';
 import { ProfileModule } from './profile/profile.module';
+import { StockModule } from './stock/stock.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -27,6 +29,9 @@ import { ProfileModule } from './profile/profile.module';
     ActivityLogModule,
     TransactionsModule,
     ProfileModule,
+    StockModule,
+    MailModule,
+    
     
   ],
 })

@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { createHash, randomBytes } from 'crypto';
 import { UsersService } from '../users/users.service';
+import { MailService } from '../mail/mail.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -26,6 +27,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
   async login(dto: LoginDto) {
@@ -63,7 +65,7 @@ export class AuthService {
       email,
       telephone: dto.telephone,
       password: hashed,
-      
+     
     });
 
     return {
@@ -88,9 +90,13 @@ export class AuthService {
 
     const link = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${token}`;
 
-    // TODO production : envoyer ce lien par email.
-    // En développement, il s'affiche dans le terminal.
-    this.logger.log(`Lien de réinitialisation pour ${user.email} : ${link}`);
+    try {
+      await this.mailService.sendPasswordReset(user.email, link);
+    } catch (err) {
+      // On ne révèle rien à l'utilisateur, mais on garde la trace de l'erreur
+      this.logger.error(`Échec d'envoi de l'email à ${user.email} : ${(err as Error).message}`);
+      this.logger.log(`[secours] Lien pour ${user.email} : ${link}`);
+    }
 
     return response;
   }

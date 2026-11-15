@@ -1,13 +1,15 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Client } from 'src/clients/schemas/client.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor( @InjectModel(User.name) private userModel: Model<User>,
+  @InjectModel(Client.name) private clientModel: Model<Client>,) {}
 
   async ensureDefaultAdmin(email: string, password: string) {
     const adminExists = await this.userModel.findOne({ role: 'admin' });
@@ -63,11 +65,16 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    const res = await this.userModel.findByIdAndDelete(id);
-    if (!res) throw new NotFoundException('Utilisateur introuvable');
-    return { deleted: true };
+  const nb = await this.clientModel.countDocuments({ commercial: id });
+  if (nb > 0) {
+    throw new BadRequestException(
+      `Ce commercial gère ${nb} client(s). Réaffectez-les ou désactivez le compte.`,
+    );
   }
-
+  const res = await this.userModel.findByIdAndDelete(id);
+  if (!res) throw new NotFoundException('Utilisateur introuvable');
+  return { deleted: true };
+}
   private sanitize(user: User) {
     const obj = user.toObject();
     delete obj.password;

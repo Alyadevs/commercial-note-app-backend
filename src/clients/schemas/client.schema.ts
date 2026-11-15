@@ -16,12 +16,12 @@ export class Client extends Document {
   notes?: string;
 
   // Le commercial responsable de ce client
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  commercial: Types.ObjectId;
+ @Prop({ type: Types.ObjectId, ref: 'User', required: false, default: null })
+commercial?: Types.ObjectId | null;
 
   // Solde de crédit actuel du client (montant qu'il doit encore)
   @Prop({ default: 0 })
-  soldeCredit: number;
+  soldeCredit!: number;
 }
 
 export const ClientSchema = SchemaFactory.createForClass(Client);
