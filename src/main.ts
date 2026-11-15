@@ -11,13 +11,17 @@ async function bootstrap() {
 
 app.use(json({ limit: '2mb' }));
 app.use(urlencoded({ limit: '2mb', extended: true }));
-  app.enableCors({
+
+app.enableCors({
   origin: [
+    'https://commercial-note-application.vercel.app',
     'http://localhost:5173',
-    'https://commercial-note-application.vercel.app/',
   ],
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true,
 });
+
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: false }),
   );
